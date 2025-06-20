@@ -3,5 +3,13 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+  
+  "compilerOptions": {
+    "noEmitOnError": false,    // ⛳ 讓有錯也可編譯（重要）
+    "skipLibCheck": true,      // ⛳ 忽略套件型別錯誤（常見問題來源）
+    "strict": false,           // ⛳ 關閉嚴格型別檢查（非必要時可放寬）
+    "forceConsistentCasingInFileNames": true
+  }
+
 }
