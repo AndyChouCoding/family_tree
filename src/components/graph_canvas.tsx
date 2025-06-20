@@ -1,6 +1,8 @@
 // src/components/GraphCanvas.tsx
 import React, { useEffect, useRef } from "react";
-import G6, { Edge, Graph, type IEdge } from "@antv/g6";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import G6, { Edge, Graph, type IEdge , type IG6GraphEvent } from "@antv/g6";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { FamilyData, FamilyEdge, FamilyNode } from "../utils/type";
 
 export let updateGraphNodeIcon: (id: string, img: string) => void = () => {};
@@ -12,6 +14,16 @@ interface Props {
   onNodeClick: (node: FamilyNode) => void;
   handleEdgeRemoved?: (edge: { source: string; target: string }) => void;
   handleEdgeAdded?: (edge: {source:string; target: string;}) => void;
+}
+
+interface AddEdgeBehaviorThis {
+  graph: Graph;
+  edge?: IEdge;
+  addingEdge?: boolean;
+}
+
+interface DeleteEdgeBehaviorThis {
+  graph: Graph;
 }
 
 const GraphCanvas: React.FC<Props> = ({
@@ -37,35 +49,37 @@ const GraphCanvas: React.FC<Props> = ({
           mousemove:    "onMousemove",
         };
       },
-      onClick(ev) {
-        const self: any = this;
-        const graph      = self.graph;
-        const model      = ev.item.getModel();
-        if (self.addingEdge && self.edge) {
+      onClick(this:AddEdgeBehaviorThis,ev:IG6GraphEvent) {
+        // const self: any = this;
+        const graph = this.graph;
+        if(!ev.item) return;
+        const model = ev.item.getModel();
+        if (this.addingEdge && this.edge) {
           // 完成第二次点击：确定 target
-          graph.updateItem(self.edge, { target: model.id });
+          graph.updateItem(this.edge, { target: model.id });
           // ✨ MOD: 通知上层新增了这条edge
           if (handleEdgeAdded) {
+            const edgeModel = this.edge.getModel() as FamilyEdge;
             handleEdgeAdded({
-              source: (self.edge.getModel() as any).source,
-              target: model.id,
+              source: edgeModel.source!,
+              target: model.id!,
             });
           }
-          self.edge      = null;
-          self.addingEdge = false;
+          this.edge = undefined;
+          this.addingEdge = false;
         } else {
           // 第一次点击：画一条“自环”edge
-          self.edge      = graph.addItem("edge", {
+          this.edge = graph.addItem("edge", {
             source: model.id,
             target: model.id,
-          });
-          self.addingEdge = true;
+          }) as IEdge ;
+          this.addingEdge = true;
         }
       },
-      onMousemove(ev) {
-        const self: any = this;
-        if (self.addingEdge && self.edge) {
-          self.graph.updateItem(self.edge, {
+      onMousemove(ev:IG6GraphEvent) {
+        // const self: any = this;
+        if (this.addingEdge && this.edge) {
+          this.graph.updateItem(this.edge, {
             target: { x: ev.x, y: ev.y },
           });
         }
@@ -75,7 +89,7 @@ const GraphCanvas: React.FC<Props> = ({
     // Register rm edge
     G6.registerBehavior("click-delete-edge", {
       getEvents() { return { "edge:click": "onClick" }; },
-      onClick(this: any, ev) {
+      onClick(this: DeleteEdgeBehaviorThis, ev:IG6GraphEvent) {
         const edge  = ev.item as IEdge;
         const model = edge.getModel();
         this.graph.removeItem(edge);
