@@ -13,7 +13,7 @@ import type { FamilyData, FamilyEdge, FamilyNode } from "./utils/type";
 import AddMemberDialog from "../src/components/add_member_dialog";
 import RemoveMemberDialog from "../src/components/rm_member_dialog";
 import EditMemberDialog from "./components/edit_member_dialog";
-import AddRelationDialog from "./components/add_relation_dialog";
+
 
 // src/App.tsx 里
 const initialData: FamilyData = {
@@ -105,7 +105,6 @@ function App() {
   const [openRemove, setOpenRemove] = useState(false);
   const [openAddEdge, setOpenAddEdge] = useState(false);
   const [openRemoveEdge, setOpenRemoveEdge] = useState(false);
-  const [openRelation, setOpenRelation] = useState(false);
   const [selectedMember, setSelectedMember] = useState<FamilyNode>();
   const [deleteTargetId, setDeleteTargetId] = useState<string>("")
 
@@ -116,15 +115,7 @@ function App() {
       return;
     }
     setSelectedMember(node);
-    setDeleteTargetId(node.id);
-    console.log(node?.name);
-    console.log(node?.gender);
-    console.log(node?.father);
-    console.log(node?.mother);
-    console.log(node?.age);
-    console.log(node?.birth);
-    console.log(node?.photo);
-    
+    setDeleteTargetId(node.id);   
   };
 
   const handleEdgeRemoved = (removeEdge:{source:string, target:string}) => {
@@ -144,6 +135,27 @@ function App() {
       return {nodes:newNodes, edges:NewEdge};
     })
   }
+
+  const handleEdgeAdded = ({ source, target }: { source: string; target: string }) => {
+    setData(prev => {
+      // 1) 把新 edge 写入 edges
+      const newEdges = [...prev.edges, { source, target }];
+      // 2) 更新对应 target 节点的 father/mother 字段
+      const newNodes = prev.nodes.map(n => {
+        if (n.id === target) {
+          // 按性别决定填 father 还是 mother
+          return { 
+            ...n,
+            ...(prev.nodes.find(p => p.id === source)?.gender === "M"
+               ? { father: source }
+               : { mother: source })
+          };
+        }
+        return n;
+      });
+      return { nodes: newNodes, edges: newEdges };
+    });
+  };
 
   const handleAdd = (
     node: FamilyNode,
@@ -185,9 +197,6 @@ function App() {
     setOpenEdit(false);
   }
 
-  const handleAddRelation = (addRelation:{source:string, target:string}) =>{
-    
-  }
 
   return (
     <>
@@ -258,14 +267,14 @@ function App() {
             variant={openAddEdge ? "contained" : "outlined"}
             color={openAddEdge ? "success" : "primary"}
             fullWidth
-            // onClick={() => {
-            //   setOpenAddEdge((x) => {
-            //     const next = !x;
-            //     if (next) setOpenRemoveEdge(false);
-            //     return next;
-            //   });
-            // }}
-            onClick={()=>{setOpenRelation(true)}}
+            onClick={() => {
+              setOpenAddEdge((x) => {
+                const next = !x;
+                if (next) setOpenRemoveEdge(false);
+                return next;
+              });
+            }}
+
           >
             新增關係
           </Button>
@@ -303,6 +312,7 @@ function App() {
             removeEdge={openRemoveEdge}
             onNodeClick={handleNodeClick}
             handleEdgeRemoved={handleEdgeRemoved}
+            handleEdgeAdded = {handleEdgeAdded}
           />
         </Box>
 
@@ -325,10 +335,6 @@ function App() {
           existingNodes={data.nodes}
           onRemove={handleRemove}
           deleteTargetId={deleteTargetId}
-        />
-        <AddRelationDialog
-          open={openRelation}
-          onClose={()=> setOpenRelation(false)}
         />
       </Box>
     </>
