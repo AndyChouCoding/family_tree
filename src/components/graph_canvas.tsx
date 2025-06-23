@@ -45,6 +45,7 @@ const GraphCanvas: React.FC<Props> = ({
   // 1. 初始化：只跑一次 → 當 container 有東西、graphRef.current 還沒被設置時，才 new Graph
   useEffect(() => {
     if (!container.current || graphRef.current) return;
+    container.current.innerHTML="";
 
     // Register add edge
     G6.registerBehavior("click-add-edge", {
@@ -211,7 +212,9 @@ const GraphCanvas: React.FC<Props> = ({
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [addEdge]); // [] 保證只跑一次
+    graph.destroy();
+    graphRef.current = null;
+  }, []); // [] 保證只跑一次
 
   // Edge Control
   // useEffect(() => {
