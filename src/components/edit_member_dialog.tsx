@@ -39,7 +39,7 @@ const EditMemberDialog: React.FC<Props> = ({
   const [day, setDay] = useState<number | undefined>(undefined);
   const [age, setAge] = useState<number | undefined>(undefined);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [_photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string>("");
 
   const maleNodes = useMemo(

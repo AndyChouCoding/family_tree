@@ -1,8 +1,6 @@
 // src/components/GraphCanvas.tsx
 import React, { useEffect, useRef } from "react";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import G6, { Edge, Graph, type IEdge , type IG6GraphEvent } from "@antv/g6";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import G6, {  Graph, type IEdge , type IG6GraphEvent } from "@antv/g6";
 import type { FamilyData, FamilyEdge, FamilyNode } from "../utils/type";
 
 export let updateGraphNodeIcon: (id: string, img: string) => void = () => {};

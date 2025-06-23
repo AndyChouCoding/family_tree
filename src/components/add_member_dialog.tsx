@@ -33,7 +33,7 @@ const AddMemberDialog = ({ open, onClose, existingNodes, onAdd }: Props) => {
   const [day, setDay] = useState<number | "">(1);
   //圖片上傳狀態
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [_photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
 
   const maleNodes = useMemo(
@@ -113,7 +113,7 @@ const AddMemberDialog = ({ open, onClose, existingNodes, onAdd }: Props) => {
       setPhotoPreview("");
     }
   };
-
+  
   return (
     <>
       <Dialog open={open} onClose={onClose}>
