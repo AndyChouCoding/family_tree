@@ -26,6 +26,13 @@ interface DeleteEdgeBehaviorThis {
   graph: Graph;
 }
 
+type BehaviorOption = {
+  getEvents:() => Record<string, string>;
+  // onClick? : (this: any, ev:IG6GraphEvent) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onMousemove?:(this:any, ev:IG6GraphEvent) => void;
+}
+
 const GraphCanvas: React.FC<Props> = ({
   data,
   addEdge,
@@ -82,9 +89,9 @@ const GraphCanvas: React.FC<Props> = ({
           this.graph.updateItem(this.edge, {
             target: { x: ev.x, y: ev.y },
           });
-        }
+        } 
       },
-    });
+    }as BehaviorOption);
 
     // Register rm edge
     G6.registerBehavior("click-delete-edge", {
@@ -94,7 +101,7 @@ const GraphCanvas: React.FC<Props> = ({
         const model = edge.getModel();
         this.graph.removeItem(edge);
         if (handleEdgeRemoved) {
-          handleEdgeRemoved({ source: model.source, target: model.target });
+          handleEdgeRemoved({ source: model.source as string, target: model.target as string});
         }
       },
     });
